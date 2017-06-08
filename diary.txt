@@ -1,0 +1,282 @@
+查找进程
+busybox ps | grep su_server
+查找文件
+ busybox  find / -name libWebRtcAudio.so
+
+
+//开启suserver
+export CLASSPATH=/extdata/local/tmp/class.jar
+app_process /extdata/loca/tmp/ cn.shine.suserver.Server &
+线程共享内存数据，所以， surface对于两个线程是共享的。所以，为了避免在画图的时候，UI线程也对surface进行操作，在画图前，需要对surface加锁。这个工作是有holder干的，holder会先锁住surface中的一块holder.lockCanvas，我们叫canvas,然后，在上面绘画，画完之后，会解锁unlockCanvasAndPost。
+
+句柄，英文：HANDLE，数据对象进入内存之后获取到内存地址，但是所在的内存地址并不是固定的，需要用句柄来存储内容所在的内存地址
+
+Java中，绘图通常在一个 Canvas 对象上进行的，Surface 中也包含了一个 Canvas 对象，这里的 CompatibleCanvas 是Surface.java 中的一个内部类，其中包含一个矩阵对象Matrix（变量名mOrigMatrix）。矩阵Matrix就是一块内存区域，针对View的各种绘画操作都保存在此内存中。 
+Surface 内部有一个 CompatibleCanvas 的内部类，这个内部类的作用是为了能够兼容 Android 各个分辨率的屏幕，根据不同屏幕的分辨率处理不同的图像数据。
+更改目录权限
+chmod -R 777  Elephant/
+
+dos下 nslookup 查看网络连接
+
+ a) adb shell
+    b) su
+（**a，b这两步是获取root权限，请注意手机显示，有弹窗的话，请点确定**）
+    c) mount -o rw,remount /system
+（**c这一步是挂载系统可读写**）
+    d) cp /system/build.prop /system/build.prop.bak
+（**d这一步是备份build.prop为build.prop.bak，不想备份的话可以跳过这一步。**）
+    e) cp /sdcard/build.prop /system/build.prop
+（**e这一步是将修改好的复制并替换掉源文件**）
+    e1）mv /sdcard/build.prop /system/build.prop
+（**e1这一步说明有的源文件存在的话会复制替换失败，所以直接移动替换即可**）
+    f) chmod 644 /system/build.prop
+（**f这一步是修改权限为rw-r-r**）
+    g) reboot
+（**重启**）
+
+非原子的64位操作：对于非volatile类型的long和double, jvm会将64位的读写操作分解为2个32位操作(java虚拟机栈中的操作数栈每个slot为32位)，对于这种变量在多线程读写操作下，有可能读取到某个值的高32位或某个值的低32位，建议在多线程环境下，对共享可变的long或double变量进行volatile声明。
+
+当变量声明为volatile后，那么编译器或运行时会主要这个变量是共享的，不会将该变量上的操作与其他内存操作一起重排序。volatile变量不会被缓存在寄存器或其他处理器不可见的地方，因此读取volatile变量总会返回最新的值。
+private volatile boolean asleep;
+...
+while (!asleep){
+    // do sth.
+}
+
+
+tools>adb remount 
+tools>adb shell 
+#su 
+#cd system/sd/data //进入系统内指定文件夹 
+#ls //列表显示当前文件夹内容 
+#rm -r xxx //删除名字为xxx的文件夹及其里面的所有文件 
+#rm xxx //删除文件xxx 
+#rmdir xxx //删除xxx的文件夹
+
+复制
+ cp /data/sunxi-ir-rx.ko /system/vendor/modules/
+
+//只能重挂载system目录
+adb shell
+ mount -o remount,rw /system
+
+ctrl +d 退出
+//路径最好不要有中文或特殊字符
+adb push E:\workspace_eclipse\r16\Settings\Settings.apk /system/priv-app
+
+rm -rf 目录名 强制删除非空目录
+
+将相关Android设备连接到电脑，确保设备能够被ADB环境识别，这个要通过adb devices命令来判断，请在CMD窗口中输入： 
+adb devices
+按键盘Enter回车键确认，如果显示出设备识别码，它通常是一长串乱号，则表明ADB运行正常，否则，请检查驱动是否正确安装
+列出目标设备中已安装的应用程序包，请在CMD窗口中输入以下命令： 
+adb shell pm list packages
+
+找到你要卸载或删除的应用包，如Skype，然后输入卸载命令： 
+adb uninstall com.skype.raider
+
+1、获取所用应用
+
+adb shell dumpsys activity
+
+
+2、获取自己的应用
+
+adb shell dumpsys activity | grep com.xxx.xxx.xx
+
+3、获取处于栈顶的activity
+
+adb shell dumpsys activity | grep mFocusedActivity
+
+
+启动应用
+adb shell am start -n shine.com.doorscreen/.activity.MainActivity
+
+adb停止 应用程序
+adb shell am force-stop  cn.com.conversant.swiftsync.android
+无信息
+adb shell am force-stop cn.autoupdate.desk 
+java -jar C:\Users\Administrator\Desktop\门口屏\signapk.jar C:\Users\Administrator\Desktop\门口屏\platform.x509.pem C:\Users\Administrator\Desktop\门口屏\platform.pk8 E:\BaiduYunDownload\DoorScreen\app\build\outputs\apk\door.apk E:\BaiduYunDownload\DoorScreen\app\build\outputs\apk\door-R16.apk
+
+//当前连接的USB设备
+busybox lsusb
+
+
+//指定设备名安装
+adb -s Z2X4C15615003478 install C:\Users\Administrator\Desktop\com.touchboarder.android.api.demos_1.9.0.apk
+
+android studio 设置页面 搜索File and Code Templates 在include选项卡设置文件头信息，比如作者等信息
+
+Setting源码中 在WifiSetting 中 修改WIFI_RESCAN_INTERVAL_MS 改变wifi扫码时间间隔
+
+系统应用如果使用so，需要放在system/lib下
+
+//数据库批插入
+private void bulkInsertOneHundredRecords() {
+          String sql = "INSERT INTO "+ SAMPLE_TABLE_NAME +" VALUES (?,?,?);";
+          SQLiteStatement statement = sampleDB.compileStatement(sql);
+          sampleDB.beginTransaction();
+          for (int i = 0; i<100; i++) {
+                    statement.clearBindings();
+                    statement.bindLong(1, i);
+                    statement.bindLong(2, i);
+                    statement.bindLong(3, i*i);
+                    statement.execute();
+           }
+           sampleDB.setTransactionSuccessful();	
+           sampleDB.endTransaction();
+} 
+
+
+通常每个套接字地址(协议/网络地址/端口)只允许使用一次。  : make_sock: could not bind to address 0.0.0.0:80 
+ 通过 netstat -a -o 查看端口占用情况，关闭调用相关端口的进程。 
+netstat -aon|findstr 5037
+tasklist /fi "pid eq 5037"
+
+   
+
+Android Studio2.3版本,集成dagger,butterknife,使用以前的依赖方式android-apt,如下
+classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+会报错
+Warning:Using incompatible plugins for the annotation processing: android-apt.This may result in an unexpected behavior.
+
+解决方法:直接删除classpath'com.neenbedankt.gradle.plugins:android-apt:1.8'和applyplugin:'android-apt',然后将apt替换为annotationProcessor
+
+android studio null value in entry: source Output Dir=null
+Gradle的bug，删除根目录下的.gradle文件夹然后rebuild
+
+
+Failed to resolve: com.jakewharton:butterknife:7.0.1 相关问题
+在根目录下build.gradle中要有以下代码
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+//更改aaa内所有文件及文件夹权限
+chmod -R 777 aaa
+//复制文件夹到文件夹，如果原目录不加/*,目录本身也会被复制
+cp -rf %s/* %s/
+
+
+在64位设备上使用32位库，
+在gradle。properity文件中添加
+android.useDeprecatedNdk=true
+在需要移除64位库的模块的build。gradle中
+defaultConfig {
+    。。。
+      ndk {
+          abiFilters "armeabi","armeabi-v7a", "x86"
+      }
+	//移除64位库
+      packagingOptions {
+          exclude "lib/arm64-v8a/libbugly.so"
+      }
+  }
+
+
+1.Generate an APK with the mixed binaries, like normal.
+
+2.Unzip the .apk file (unzip *.apk from the command line works fine) and examine the lib/arm64-v8a directory. (If the directory doesn’t exist, you have no packaged ARM64 libraries, and shouldn’t have a problem.)
+
+3.In your gradle.properties in the project root, add the line android.useDeprecatedNdk=true.
+
+4.Add the following block to your build.gradle file, adding an exclude line for every 64-bit dependency you found in step 2.
+android {
+    ...
+    defaultConfig {
+        ...
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
+
+        packagingOptions {
+            exclude "lib/arm64-v8a/librealm-jni.so"
+        }
+    }
+}
+
+http://stackoverflow.com/questions/30782848/how-to-use-32-bit-native-libaries-on-64-bit-android-device
+
+adb push 路径最好不要包含中文 否则文件名可能截断
+
+mannifest.xml中的包名不留意丢失 build过程并不显示包名字符串为空，得到如下错误，恢复包名，重新build
+Error:Execution failed for task ':app:generateShineDebugBuildConfig'.
+> java.io.FileNotFoundException: E:\workspace_lxl\DepartmentsConsultation\app\build\generated\source\buildConfig\shine\debug\ \BuildConfig.java (系统找不到指定的路径。)
+
+Android Studio 自定义注释&快速输入代码片段
+http://www.codingnote.net/2016/05/12/Android-Studio-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E9%87%8A-%E5%BF%AB%E9%80%9F%E8%BE%93%E5%85%A5%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5/
+
+
+
+
+
+
+
+关于java.lang.IllegalArgumentException: View not attached to window manager 错误的分析
+
+(2). 为什么会报View not attached to window manager错误？
+       这个错误的意思是说我们所操作的View没有被纳入window manager的管理。
+       我们知道所有的窗口创建和管理都是依附于window manager的，因此Dialog的创建也不例外。Dialog的创建流程通过查看源码可以知道，在Dialog的构造函数中，创建了一个Window对象，但我们知道Window对象并不是用于显示的，真正用于显示的是View对象。因此通过Dialog的show方法构造了一个mDecor的View对象，并最终通过WindowManager的addView()方法显示Dialog。
+
+ 这里的WindowManager报错是什么意思呢？这段log是WindowManager抛出的error错误，当我们的Dialog还没有dismiss时，如果此时该Activity被销毁了，那么就会出现以上错误，提示窗口泄漏(leaked window)。
+
+(5). 如何解决这个问题呢？
+       通过以上分析之后我们知道了问题出现的原因，那么如何解决呢？可以通过以下两个方面来解决：
+1. 使用Activity自带的Dialog控制方法
+       在Activity中需要使用对话框，可以使用Activity自带的回调，比如onCreateDialog(),showDialog(),dimissDialog(),removeDialog()等等。毕竟这些都是Activity自带的方法，所以用起来更方便，也不用显示创建和操控Dialog对象，一切都由框架操控，相对来说比较安全。
+2. 限制Dialog的生命周期
+       让创建的Dialog对象的存活周期跟Activity的生命周期一致，也就是说Dialog的生命周期被限定在Activity的onCreate()和onDestroy()方法之间。
+
+
+Lifecycle Sorter
+
+可以根据Activity或者fragment的生命周期对其生命周期方法位置进行先后排序，快捷键Ctrl + alt + K
+
+
+---------bat批处理文件中循环处理命令-------
+::设备集合
+set set=172.168.54.25,172.168.54.34
+::循环处理，多个命令必须用（）包含
+for %%i in (%set%) DO (adb disconnect 
+adb connect  %%i
+adb root
+adb connect  %%i
+adb install -r %app_path%\audio-debug.apk
+adb shell " am start -n com.shine.audio/com.activity.AudioRtcActivity")
+
+
+git 登录操作：ssh repo@ext.shine.com.cn
+clone 操作 ：git clone   repo@ext.shine.com.cn:System/MSettings.git
+ M828_Launcher3_Android_5_0.git
+
+//创建裸仓库
+$ git clone --bare my_project my_project.git
+//把罗仓库放到服务器上
+$ scp -r my_project.git user@git.example.com:/opt/git
+
+通常每个套接字地址(协议/网络地址/端口)只允许使用一次。  : make_sock: could not bind to address 0.0.0.0:80 
+ 通过 netstat -a -o 查看端口占用情况，关闭调用相关端口的进程。 
+netstat -aon|findstr 5037
+tasklist /fi "pid eq 5037"
+
+--------------------------
+Duplicate files copied in APK META-INF/rxjava.properties
+
+在模块中
+android{
+....
+packagingOptions {
+    exclude 'META-INF/rxjava.properties'
+    // ... and any other excludes Go here
+}
+ ....
+}  
+
+--------------------
+tcpdump for android 抓包
+参考链接 包含下载地址
+http://mrpeak.cn/blog/tutorial-tcpdump/
+
+

@@ -1,0 +1,42 @@
+一个应用的Activity页面也可以添加权限
+<activity android:name="...."
+   android:permission=”com.google.socialapp.permission.SHARE_POST”
+
+/>
+这样其他应用在调用这个应用的页面时必须有这个权限
+<manifest>
+   <uses-permission android:name="com.google.socialapp.permission.SHARE_POST" />
+</manifest>
+参考如下安全问题
+https://developer.android.com/training/articles/security-tips.html
+
+
+onStart（）
+It might also register a BroadcastReceiver that monitors changes that are reflected in the UI.
+
+onResume()
+you should begin animations and initialize components that the activity only uses when it has user focus.
+
+onPause()
+You can use the onPause() method to release system resources, such as broadcast receivers, handles to sensors (like GPS), or any resources that may affect battery life while your activity is paused and the user does not need them.
+存在时间短
+You should not use onPause() to save application or user data, make network calls, or execute database transactions.
+
+onStop()
+保持所有状态和成员变量，但不在依附Window Manager
+取消广播，释放资源，因为onDestory也许不会调用，保存数据到数据库
+
+onDestroy()
+finish（），系统回收（直接杀死应用进程而不是单个页面），orientation change 都会调用，
+
+
+ Here's the order of operations that occur when Activity A starts Acivity B:
+
+Activity A's onPause() method executes.
+Activity B's onCreate(), onStart(), and onResume() methods execute in sequence. (Activity B now has user focus.)
+Then, if Activity A is no longer visible on screen, its onStop() method executes.
+
+如果系统回收了页面，当你重新导航到此页面时，系统会根据保存的信息重建这个页面
+
+保存页面状态
+页面一旦进入onStop，系统就会调用 onSaveInstanceState() 方法保存状态信息，默认保存的是页面视图信息，比如编辑框的内容，ListView的位置。自己可以复写onSaveInstanceState()，保存更多信息，记得调用父类方法。onRestoreInstanceState()在页面恢复调用，同样需要调用父类方法

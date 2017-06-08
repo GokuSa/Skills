@@ -1,0 +1,4 @@
+sqlite 数据类型有integer（long），text(String),real(double)
+数据库操作涉及文件系统访问，所以尽量在子线程操作
+创建的数据库保存在data/data的包名下，前提是Environment.getDataDirectory()返回data/data
+查询返回的cursor只指向结果的一列，这样可以节省内存

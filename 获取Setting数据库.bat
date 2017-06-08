@@ -1,0 +1,1 @@
+adb pull /data/data/com.android.settings/databases/setting.db C:\Users\Administrator\Desktop\setting.db
