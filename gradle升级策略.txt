@@ -1,0 +1,5 @@
+1.手动从https://services.gradle.org/distributions/下载需要的版本
+2.解压到C:\Users\Administrator\.gradle\wrapper\dists目录下（Win版本）
+3.打开Android Studio，在设置页面 File->Settings->Build, Exectution, Deployment->Gradle and set "Gradle home" to point your new gradle folder
+4.项目中找到gradle-wrapper.properties文件，修改gradle版本 如下
+修改distributionUrl=https\://services.gradle.org/distributions/gradle-4.1.zip

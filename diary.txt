@@ -279,4 +279,23 @@ tcpdump for android 抓包
 参考链接 包含下载地址
 http://mrpeak.cn/blog/tutorial-tcpdump/
 
+在android studio 编辑日志筛选 edit fliter configuration
+同时筛选TAG为 ActivityThread和PlayerInterface
+^ActivityThread$|^PlayerInterface$  或者 (?=(MeetingPresenter|MeetingActivity))
+
+剔除tag1到4
+^(?!(tag1|tag2|tag3|tag4))
+
+
+
+  java.lang.UnsatisfiedLinkError: dlopen failed: /data/app/com.lxl.decard-1/lib/arm/libwlt2bmp.so: has text relocations
+
+需要将targetSdkVersion 设成 22
+
+网络调式工具
+network throttling tools fiddler
+If you're running windows, fiddler is a great tool. It has a setting to simulate modem speed, and for someone who wants more control has a plugin to add latency to each request.
+
+
+
 

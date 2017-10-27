@@ -1,0 +1,26 @@
+三种Buffers ：FrameBuffer  RenderBUffer Buffer Object
+
+Frame Buffers is the most abstract of the three. When you make an OpenGL's render you can send the final image directly to the device's screen or to a Frame Buffer. So Frame Buffer is a temporary image data, right? 
+Not exactly. You can image it as an output from an OpenGL's render and this can means a set of images, not just one. What kind of images? Images about the 3D objects, about the depth of objects in space, the intersection of objects and about the visible part of objects. So the Frame Buffer is like a collection of images. All of these stored as a binary array of pixel's information.
+帧缓冲可以想象为opengl渲染的输出，包含一系列图像的信息。所有这些像素信息都以二进制数组形式保存
+
+
+Render Buffer is a temporary storage of one single image. Now you can see more clearly that a Frame Buffer is a collection of Render Buffers. Exist few kinds of Render Buffer: Color, Depth and Stencil.Render Buffer 是单个图片的临时存储，有颜色、深度、模具三种类型Render Buffer 缓冲
+
+Buffer Objects is a storage which OpenGL calls "server-side" (or server’s address space). The Buffer Objects is also a temporary storage, but not so temporary like the others. A Buffer Object can persist throughout the application execution. Buffer Objects can hold informations about your 3D objects in an optimized format. These information can be of two type: Structures or Indices.
+Buffer Objects 是一个在服务端的临时存储，能贯彻整个应用的执行，以优化的格式持有3D图形信息。这种信息有两种类型 ：结构 和 索引
+
+The rasterize is the process by which OpenGL takes all informations about 3D objects (all that coordinates, vertices, maths, etc) to create a 2D image.光栅化就是OpenGL利用3D对象的所有信息（坐标，顶点，等）把它转化成2D图片的过程
+
+What Vertex Shader will do is define the final position of a Vertex
+Fragment Shader（FSH） will be processed at each VISIBLE fragment of the final image。
+
+It's mandatory ONE Vertex Shader to ONE Fragment Shader, no more or less, must be exactly one to one. To ensure we'll not make mistakes, OpenGL has something called Program. A Program in OpenGL is just the compiled pair of VSH and FSH。一个顶点着色器董事对应一个片段着色器，为了保证一对一的关系，就出现了Program，保证它们成对编译
+
+
+Setup EGL
+1.The first thing that EGL needs to know is where we want to display our content, normally it is done with the function eglGetDisplayEGL需要知道的第一件事就是在哪显示，通过eglGetDisplayEGL完成，让后通过eglInitialize 完成初始化
+2.使用eglChooseConfigs选择配置信息如： color format, colors individually, the sizes, the transparency, the samples per pixel, pixel format。这样就能桥连gles输出和屏幕设备
+3.为gles的渲染输出提供surface，有两种方式： eglCreateWindowSurface直接到屏幕 or eglCreatePbufferSurface离屏渲染
+通过上面三部EGL知道了窗口系统相关的信息，下面关联gles
+1.EGL需要知道从哪获取gles的frame buffer(一对)输出，只需要先创建EGL context，后调用eglmakeCurrent()就能使EGL使用gles的frame buffer.这里采用一对frame buffer交替渲染、显示，通过eglSwapBuffers（）切换，

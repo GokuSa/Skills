@@ -1,0 +1,26 @@
+1.graphics hardware abstraction layer (HAL) 
+2.In Android, hardware acceleration for Canvas APIs is accomplished with a drawing library called OpenGLRenderer that translates Canvas operations to OpenGL operations so they can execute on the GPU.（关键词：硬件加速 Canvas OpenGLRenderer OpenGL）
+API>=14以后默认支持硬件加速，但有的图形绘制不支持，会导致异常，硬件加速可以在四个级别控制：Application Activity Window View。
+注意在Window级别不能明令禁止，View级别不能明令开启。在View级别使用Canvas.isHardwareAccelerated()检查结果。
+	在意这些细微差异的原因在于基于软件的绘制模型和支持硬件加速的绘制模型不同
+	基于软件：如果View结构的一部分需要重绘，那么与之相关的结构都要重绘，即使并不需要，而且涉及大量代码的执行
+	硬件加速：使用displayList记录绘制命令，View结构发生改变的使用仅做更新绘制
+
+ 在使用canvas绘制图形的时候，为什么要lockCanvas？为了防止一块缓存不会被两个客户同时更新或修改。同步问题
+To ensure that a buffer isn't updated by two clients at once, or written to while being displayed, you have to lock the buffer to access it. lockCanvas() locks the buffer and returns a Canvas to use for drawing, and unlockCanvasAndPost() unlocks the buffer and sends it to the compositor.
+
+
+SurfaceFlinger’s role is to accept buffers of data from multiple sources, composite them, and send them to the display.
+
+After SurfaceFlinger has collected all buffers for visible layers, it asks the Hardware Composer how composition should be performed.
+
+The Hardware Composer HAL (“HWC”) was first introduced in Android 3.0 (“Honeycomb”) and has evolved steadily over the years. Its primary purpose is to determine the most efficient way to composite buffers with the available hardware. As a HAL, its implementation is device-specific and usually implemented by the display hardware OEM.
+
+HWC works like this:
+SurfaceFlinger provides the HWC with a full list of layers, and asks, “how do you want to handle this?”
+The HWC responds by marking each layer as “overlay” or “GLES composition.”
+SurfaceFlinger takes care of any GLES composition, passing the output buffer to HWC, and lets HWC handle the rest.*
+
+
+The Surface represents the producer side of a buffer queue that is often (but not always!) consumed by SurfaceFlinger. When you render onto a Surface, the result ends up in a buffer that gets shipped to the consumer. A Surface is not simply a raw chunk of memory you can scribble on.
+Surface代表了一个buffer queue的生产者一侧，这个buffer queue一般被（但不是总是）被Surfaceflinger来消费。当你向一个Surface渲染时，结果最终在一个缓冲区内被运送到消费者那里。一个Surface并不是一个可以任意修改的简单raw内存数据块。

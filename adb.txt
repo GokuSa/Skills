@@ -41,8 +41,9 @@ adb shell dumpsys activity top
 要获取当前界面的Activity：
 adb shell dumpsys activity top | findstr ACTIVITY
 获取package信息：
+adb shell dumpsys activity packagename 获取相关包名下的activity信息
 
-adb shell dumpsys package
+adb shell dumpsys package  
 加上-h可以获取帮助信息
 获取某个包的信息：
 adb shell dumpsys package PACKAGE_NAME
@@ -94,3 +95,6 @@ mDataConnectionState=2 #0：无数据连接 1：正在创建数据连接 2：已连接
 mDataConnectionPossible=true  #是否有数据连接
 mDataConnectionApn=   #APN名称
 等
+
+带时间的日志
+adb logcat -v time MeetingActivity:D MeetingPresenter:D *:S
