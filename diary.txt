@@ -296,6 +296,7 @@ http://mrpeak.cn/blog/tutorial-tcpdump/
 network throttling tools fiddler
 If you're running windows, fiddler is a great tool. It has a setting to simulate modem speed, and for someone who wants more control has a plugin to add latency to each request.
 
-
+sublime package control 无效问题
+Take a look in your user Preferences.sublime-settings and remove the Package Control from the "ignored_packages" list if it is there.
 
 

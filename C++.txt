@@ -1,0 +1,93 @@
+
+window7 64 平台下 sublime C++ build System 的配置; g++ -v=6.03
+{  
+    "cmd": ["g++", "-std=gnu++11", "${file}", "-o", "${file_path}/${file_base_name}"],  
+    "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",  
+    "working_dir": "${file_path}",  
+    "selector": "source.c, source.c++",  
+
+    "variants":  
+    [  
+        {  
+            "name": "Run",  
+            "cmd": ["cmd", "/c", "g++", "-std=gnu++11", "${file}", "-o", "${file_path}/${file_base_name}", "&&", "cmd", "/c", "${file_path}/${file_base_name}"]  
+        },  
+        {  
+            "name": "RunInCommand",  
+            "cmd": ["cmd", "/c", "g++", "-std=gnu++11", "${file}", "-o", "${file_path}/${file_base_name}", "&&", "start", "cmd", "/c", "${file_path}/${file_base_name} & pause"]  
+        }  
+    ]  
+}  
+
+
+C++中#表示预处理指令 <库名>表示在标准库中查找 "库名"表示先在当前目录查找，没有就在标准库找
+编译：g++  main.cpp -o main.out
+运行：./main.out
+使用命名空间
+using namespace std;
+
+endl appends '\n' to the stream and calls flush() on the stream. So
+
+cout << x << endl;
+is equivalent to
+
+cout << x << '\n';
+cout.flush();
+
+定义常量 const int s=100;
+
+#include <iomanip> 格式化输出  
+std::setw(10)---》十个字符的空格
+
+//切换标准输入源为文件 失败
+"g++", "-o main.out", "main.cpp"
+"./main.out", stdin=open("input.txt", "r")
+
+获取一行 ，cin为标准输入流，line为接受的字符串
+getline(cin,line);
+
+// 字符串解析为数字
+#include <sstream>
+float length=0;
+//把字符串解析为指定数字类型
+stringstream(line)>>length;
+
+
+//数学库
+#include <cmath>
+M_PI=3.1415....;
+//求底数的幂
+pow(base,params);
+
+char b='c';
+//获取字符地址的方式
+cout<<"b address "<<(void *)&b<<endl;
+
+//重定向
+#include <iostream>  
+#include <fstream>  
+using namespace std;  
+   
+ifstream fin("input.txt");  
+ofstream fout("output.txt");  
+streambuf *cinbackup;  
+streambuf *coutbackup;  
+void main()  
+{  
+    coutbackup= cout.rdbuf(fout.rdbuf());  
+    cinbackup= cin.rdbuf(fin.rdbuf());  
+    cout<<"Hello world"<<endl;   
+    char line[100];  
+    cin>>line;  
+    cout<<line<<endl;  
+    // restore standard streambuf  
+    cin.rdbuf(cinbackup);  
+    cout.rdbuf(coutbackup);  
+} 
+
+//不同参数类型的模板 返回第一个参数值类型 
+test(1.1,3) 返回float test(3,1,1)返回int
+template <typename T,typename U>
+T test(T intput1,U input2){
+    return intput1-input2;
+}

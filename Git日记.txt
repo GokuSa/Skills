@@ -12,7 +12,7 @@ clone 操作 ：git clone   repo@ext.shine.com.cn:System/MSettings.git
 如果使用了git init初始化，则远程仓库的目录下，也包含work tree，当本地仓库向远程仓库push时,   如果远程仓库正在push的分支上（如果当时不在push的分支，就没有问题）, 那么push后的结果不会反应在work tree上,  也即在远程仓库的目录下对应的文件还是之前的内容，必须得使用git reset --hard才能看到push后的内容.
 
 4.成功后地址就是repo@ext.shine.com.cn:topFolder/example.git 
-
+repo@ext.shine.com.cn:lxl/VideoMeeting.git
 5.本地仓库的创建在项目根目录下git init
 6.git add * 添加所有文件到stagging area
 7 git commit -a -m "comment" 提交到仓库
@@ -29,6 +29,6 @@ git clean -n
 Clean Step - beware: this will delete files:
 
 git clean -f
-To remove directories, run git clean -f -d or git clean -fd
+To remove directories, run git clean -f -d or git clean -fd  不要使用
 To remove ignored files, run git clean -f -X or git clean -fX
 To remove ignored and non-ignored files, run git clean -f -x or git clean -fx
