@@ -34,7 +34,7 @@
     C:\Users\Administrator>adb uninstall shine.shineplayer
 
 ###解决dos窗口中文乱码
-	设置编码为UTF-8
+	//设置编码为UTF-8
     C:\Users\Administrator>chcp 65001
 	左上角点击——选择属性——字体——Lucida Console——确定
 

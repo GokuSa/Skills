@@ -299,4 +299,6 @@ If you're running windows, fiddler is a great tool. It has a setting to simulate
 sublime package control 无效问题
 Take a look in your user Preferences.sublime-settings and remove the Package Control from the "ignored_packages" list if it is there.
 
+as中使用正则替换行级注释
+//[^\n]*
 

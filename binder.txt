@@ -1,0 +1,179 @@
+源码结构
+/framework/base/core/java/               (Java)
+/framework/base/core/jni/                (JNI)
+/framework/native/libs/binder            (Native)
+/framework/native/cmds/servicemanager/   (Native)
+/kernel/drivers/staging/android          (Driver)
+
+杂项设备（misc device）
+杂项设备也是在嵌入式系统中用得比较多的一种设备驱动。在 Linux 内核的include\linux目录下有Miscdevice.h文件，要把自己定义的misc device从设备定义在这里。其实是因为这些字符设备不符合预先确定的字符设备范畴，所有这些设备采用主编号10，一起归于misc device，其实misc_register就是用主标号10调用register_chrdev()的。
+也就是说，misc设备其实也就是特殊的字符设备。
+
+The part of the hard disk that is used as virtual memory is called the swap space.
+硬盘上用来做虚拟内存的那部分叫 交换空间
+
+
+在IPC通信过程中，Binder驱动（dev/binder）位于内核空间 其他都是用户空间
+BpBinder(客户端)和BBinder(服务端)都是Android中Binder通信相关的代表，它们都从IBinder类中派生而来
+client端：BpBinder.transact()来发送事务请求；
+server端：BBinder.onTransact()会接收到相应事务。
+
+
+Stub：来自维基
+桩程序是一段并不执行任何实际功能的程序，只对接受的参数进行声明并返回一个合法值。这个返回值通常只是一个对于调用者来讲可接受的值即可。桩通常用在对一个已有接口的临时替换上，实际的接口程序在未来再对桩程序进行替换。
+
+在远程方法调用（RMI）中将客户辅助对象称之为Stub（桩）；将服务辅助对象称之为skeleton[2]（骨架）。
+
+RMI的过程是：客户对象一旦被调用，客户对象调用stub，stub调用网络远端的skeleton，而skeleton最终调用真正的服务对象。由此，在调用客户对象的时候，感觉上就是直接调用了真正的服务对象。
+
+
+IBinder:This interface describes the abstract protocol for interacting with a remotable object,这个接口描述了与远程对象交互的抽象协议
+
+Binder：Binder实现了iBinder，而是直接继承Binder即可，建议不直接实现。
+应用在自己的进程运行，其他应用相对自己就是Remotable object，
+Binder就是为这些remotable object提供通信的基础。一般app通过aidl来生成Binder代码，也可以手动实现，比较麻烦，如果直接使用BInder实例可以在进程间当token使用
+
+
+ProcessState.cpp 作用是什么？
+
+mmap 为什么要映射内存？谁执行？
+1。操作系统启动线程
+2.进程间通讯 共享内存实现
+3.读写大文件
+
+
+进程看到的所有地址组成的空间，就是虚拟空间。虚拟空间是某个进程对分配给它的所有物理地址（已经分配的和将会分配的）的重新映射， mmap的作用，在应用这一层，是让你把文件的某一段，当作内存一样来访问
+
+framework/native/cmds/servicemanager/
+  - service_manager.c
+  - binder.c
+ServiceManager 是通过init进程通过解析init.rc文件而启动的，用来注册服务，查询服务，是IPC过程的守护进程，本身也是Binder服务，但它与Binder驱动的通信是自定义的bind.c
+
+在ServiceManger 的入口函数调用bind.c中的bind_open(128*1024),这个方法有两个重要的事
+通过系统调用陷入内核，打开binder驱动设备，调用驱动层的bind_open(...)
+1.  bs->fd = open("/dev/binder", O_RDWR);
+通过系统调用映射内存，mapSize必须是page（1024*4）的整数倍，这里是128*1024,最终调用驱动层的mmap(...)
+2.  bs->mapped = mmap(NULL, mapsize, PROT_READ, MAP_PRIVATE, bs->fd, 0);
+
+
+struct binder_state
+{
+    int fd; // dev/binder的文件描述符
+    void *mapped; //指向mmap的内存地址
+    size_t mapsize; //分配的内存大小，默认为128KB
+};
+
+成功打开binder驱动后， binder_become_context_manager（bs），成为服务大管家
+通过ioctl系统调用
+ioctl(bs->fd, BINDER_SET_CONTEXT_MGR, 0);
+最终调用binder驱动的binder_ioctl(...)
+在这个方法中实现了SystemManager的注册，详情不胜了解。主要有
+创建SystemManager的实体，binder_context_mgr_node为全局变量，类型为binder_node结构体
+binder_context_mgr_node = binder_new_node(proc, 0, 0);
+
+接下来进入Loop循环 提供查询和注册服务
+
+
+
+Binder驱动
+ 在misc设备进行注册，作为虚拟字符设备，没有直接操作硬件，只是对设备内存处理。
+主要工作
+ 设备初始化(binder_init) 创建设备节点（"dev/binder/"）
+ 打开(binder_open) 获取Binder Driver 的文件描述符
+ 映射(binder_mmap) 在内核分配内存 用来存储数据
+ 数据操作(binder_ioctl) 将IPC数据作为参数发给Binder Driver
+
+ 系统调用
+ 	用户层调用内核层方法需要通过系统调用陷入内核，比如打开Binder驱动的调用链，
+ 	 open-> __open() -> binder_open()
+ 	 在用户空间调用open(),会引起系统方法__open()调用，通过查找(?)调用到binder驱动的binder_open()
+
+内核层的mmap（文件描述符，用户进程虚拟空间）
+	1.申请与用户虚拟空间同等大小的虚拟内核空间
+	2.分配一个page大小的物理内存
+	3.再将同一块物理内存映射到内核虚拟地址空间和用户虚拟地址空间
+	实现了用户空间buffer和内核空间buffer的同步操作？？
+
+binder_ioctl（文件描述符，命令 ，数据）
+	负责在两个进程间收发IPC数据和IPC Reply（难道reply 不算数据）
+	不同命令对应不同数据类型  BINDER_WRITE_READ 最为常用
+
+ioctl命令					数据类型					操作
+BINDER_WRITE_READ			struct binder_write_read	收发Binder IPC数据
+BINDER_SET_MAX_THREADS		__u32						设置Binder线程最大个数
+BINDER_SET_CONTEXT_MGR		__s32						设置Service Manager节点
+BINDER_THREAD_EXIT			__s32						释放Binder线程
+BINDER_VERSION				struct binder_version		获取Binder版本信息
+BINDER_SET_IDLE_TIMEOUT		__s64						没有使用
+BINDER_SET_IDLE_PRIORITY	__s32						没有使用
+
+其中从copy_to_user具体是哪个user？？？
+
+#3.9 binder_buffer
+每一次Binder传输数据时，都会先从Binder内存缓存区中分配一个binder_buffer来存储传输数据。
+
+类型							成员变量	解释
+struct list_head				entry		buffer实体的地址
+struct rb_node					rb_node		buffer实体的地址
+unsigned						free		标记是否是空闲buffer，占位1bit
+unsigned						allow_user_free	是否允许用户释放，占位1bit
+unsigned						async_transaction	占位1bit
+unsigned						debug_id	占位29bit
+struct binder_transaction *		transaction	该缓存区的需要处理的事务
+struct binder_node *			target_node	该缓存区所需处理的Binder实体
+size_t							data_size	数据大小
+size_t							offsets_size	数据偏移量
+uint8_t							data[0]	数据地址
+每一个binder_buffer分为空闲和已分配的，通过free标记来区分。空闲和已分配的binder_buffer通过各自的成员变量rb_node分别连入binder_proc的free_buffers(红黑树)和allocated_buffers(红黑树)。
+
+
+BC_PROTOCOL
+binder请求码，是用enum binder_driver_command_protocol来定义的，
+是用于应用程序向binder驱动设备发送请求消息，
+应用程序包含Client端和Server端，以BC_开头，总17条；(-代表目前不支持的请求码)
+重要的两个
+请求码				参数类型					作用
+BC_TRANSACTION		binder_transaction_data		Client向Binder驱动发送请求数据
+BC_REPLY			binder_transaction_data		Server向Binder驱动发送请求数据
+BC_REGISTER_LOOPER	无参数	创建新的looper线程
+BC_ENTER_LOOPER	无参数	应用线程进入looper
+BC_EXIT_LOOPER	无参数	应用线程退出looper
+
+Binder线程创建与退出：
+BC_ENTER_LOOPER：binder主线程(由应用层发起)的创建会向驱动发送该消息；joinThreadPool()过程创建binder主线程;
+BC_REGISTER_LOOPER：Binder用于驱动层决策而创建新的binder线程；joinThreadPool()过程,创建非binder主线程;
+BC_EXIT_LOOPER：退出Binder线程，对于binder主线程是不能退出;joinThreadPool()的过程出现timeout,并且非binder主线程,则会退出该binder线程;
+
+ BR_PROTOCOL
+binder响应码，是用enum binder_driver_return_protocol来定义的，
+是binder设备向应用程序回复的消息，，应用程序包含Client端和Server端，以BR_开头，总18条；
+
+BR_SPAWN_LOOPER				无参数						创建新的Looper线程
+BR_TRANSACTION				binder_transaction_data		Binder驱动向Server端发送请求数据
+BR_REPLY					binder_transaction_data		Binder驱动向Client端发送回复数据
+BR_TRANSACTION_COMPLETE		无参数						对请求发送的成功反馈	
+
+
+内核用struct page结构体表示每个物理页，struct page结构体占40个字节
+struct page {
+       page_flags_t flags;  页标志符
+       atomic_t _count;    页引用计数
+       atomic_t _mapcount;     页映射计数
+       unsigned long private;    私有数据指针
+       struct address_space *mapping;    该页所在地址空间描述结构指针，用于内容为文件的页帧
+       pgoff_t index;               该页描述结构在地址空间radix树page_tree中的对象索引号即页号
+       struct list_head lru;        最近最久未使用struct slab结构指针链表头变量
+       void *virtual;               页虚拟地址
+};
+
+用户空间中进程的内存，往往称为进程地址空间,每个进程都有一个32位或64位的地址空间，
+一个进程可寻址4GB的虚拟内存（32位地址空间中），但不是所有虚拟地址都有权访问
+对于进程可访问的地址空间称为内存区域。每个内存区域都具有对相关进程的可读、可写、可执行属性等相关权限设置。
+应用程序操作的对象是映射到物理内存之上的虚拟内存，而处理器直接操作的是物理内存。故应用程序访问一个虚拟地址时，需要将虚拟地址转换为物理地址，然后处理器才能解析地址访问请求
+
+Linux采用虚拟内存管理技术，每个进程都有各自独立的进程地址空间(即4G的线性虚拟空间)，无法直接访问物理内存。这样起到保护操作系统，并且让用户程序可使用比实际物理内存更大的地址空间。
+
+4G进程地址空间被划分两部分，内核空间和用户空间。用户空间从0到3G，内核空间从3G到4G；
+用户进程通常情况只能访问用户空间的虚拟地址，不能访问内核空间虚拟地址。只有用户进程进行系统调用(代表用户进程在内核态执行)等情况可访问到内核空间；
+用户空间对应进程，所以当进程切换，用户空间也会跟着变化；
+内核空间是由内核负责映射，不会跟着进程变化；内核空间地址有自己对应的页表，用户进程各自有不同额页表。

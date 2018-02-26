@@ -24,3 +24,14 @@ SurfaceFlinger takes care of any GLES composition, passing the output buffer to 
 
 The Surface represents the producer side of a buffer queue that is often (but not always!) consumed by SurfaceFlinger. When you render onto a Surface, the result ends up in a buffer that gets shipped to the consumer. A Surface is not simply a raw chunk of memory you can scribble on.
 Surface代表了一个buffer queue的生产者一侧，这个buffer queue一般被（但不是总是）被Surfaceflinger来消费。当你向一个Surface渲染时，结果最终在一个缓冲区内被运送到消费者那里。一个Surface并不是一个可以任意修改的简单raw内存数据块。
+
+you should use a Surface for raw video data to improve codec performance. Surface uses native video buffers without mapping or copying them to ByteBuffers。对于原始视频数据，尽量使用surface来提高性能，它使用本地视频缓存，不需要映射或拷贝到ByteBuffers中
+
+The View part of a SurfaceView is just a see-through placeholder。SurfaceView的视图部分只是一个透明的占位符。
+
+为什么SurfaceView需要回调来说明Surface的可用性：
+When the SurfaceView's View component is about to become visible, the framework asks the WindowManager to ask SurfaceFlinger to create a new Surface. (This doesn't happen synchronously, which is why you should provide a callback that notifies you when the Surface creation finishes.) 
+Whatever you render onto this Surface will be composited by SurfaceFlinger, not by the app.在SurfaceView上渲染的任何东西都由SurfaceFlinger合成，而不是app。所以性能很高
+
+
+

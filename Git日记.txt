@@ -21,6 +21,8 @@ repo@ext.shine.com.cn:lxl/VideoMeeting.git
 
 删除远程仓库
 git remote rm github
+//更新本地代码
+git pull origin master
 
 Remove untracked files from the working tree
 Step 1 is to show what will be deleted by using the -n option:

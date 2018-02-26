@@ -1,3 +1,25 @@
+ Everything we do in 3D world is to recreate the sensations from the human eye: the perpectives, the vanish points, the distortions, the depth of field, the focus, the field of view, in resume, everything is to simulate that sensations. 
+
+The GPU is much much faster to deal with floating point numbers than the CPU. This is the fundamental reason to a 3D game run faster with better Graphics Cards.
+
+ OpenGL gives to us a lot of features to store images, datas and informations in an optimized format. These optimized data will be processed later directly by the GPU
+
+--------------------
+OpenGL works around these 3 concepts: Primitives  Buffers  Rasterize
+
+Primitives图元 
+OpenGL's primitives is limited to 3 little kind of objects: 点 线 三角形
+
+About a 3D Point in space (x,y,z)
+About a 3D Line in space (composed by two 3D Points)
+About a 3D Triangle in space (composed by three 3D Points)
+
+A 3D Point can be used as a particle in the space. 点作为粒子
+A 3D Line is always a single line and can be used as a 3D vector. 线作为向量
+A 3D Triangle could be one face of a mesh which has thousands, maybe millions faces. 三角形是构成面的基本单位
+
+Buffers
+Now let's talk about the buffers. In simple words, buffer is a temporary optimized storage
 三种Buffers ：FrameBuffer  RenderBUffer Buffer Object
 
 Frame Buffers is the most abstract of the three. When you make an OpenGL's render you can send the final image directly to the device's screen or to a Frame Buffer. So Frame Buffer is a temporary image data, right? 
@@ -7,20 +29,92 @@ Not exactly. You can image it as an output from an OpenGL's render and this can 
 
 Render Buffer is a temporary storage of one single image. Now you can see more clearly that a Frame Buffer is a collection of Render Buffers. Exist few kinds of Render Buffer: Color, Depth and Stencil.Render Buffer 是单个图片的临时存储，有颜色、深度、模具三种类型Render Buffer 缓冲
 
-Buffer Objects is a storage which OpenGL calls "server-side" (or server’s address space). The Buffer Objects is also a temporary storage, but not so temporary like the others. A Buffer Object can persist throughout the application execution. Buffer Objects can hold informations about your 3D objects in an optimized format. These information can be of two type: Structures or Indices.
-Buffer Objects 是一个在服务端的临时存储，能贯彻整个应用的执行，以优化的格式持有3D图形信息。这种信息有两种类型 ：结构 和 索引
+Buffer Objects is a storage which OpenGL calls "server-side" (or server’s address space). The Buffer Objects is also a temporary storage, but not so temporary like the others. A Buffer Object can persist throughout the application execution. Buffer Objects can hold informations about your 3D objects in an optimized format. 
+是一个在服务端的临时存储，能贯彻整个应用的执行，以优化的格式持有3D图形信息。
+These information can be of two type: Structures or Indices
+这种信息有两种类型 ：结构 和 索引
+Structures ：an array of vertices, an array of texture coordinates 顶点数组或纹理坐标数组
+Indices：The array of indices is to be used to indicate how the faces of your mesh will be constructed based on an array of structures.索引决定结构数组如何构建面
+
 
 The rasterize is the process by which OpenGL takes all informations about 3D objects (all that coordinates, vertices, maths, etc) to create a 2D image.光栅化就是OpenGL利用3D对象的所有信息（坐标，顶点，等）把它转化成2D图片的过程
 
+------------------------------
+
 What Vertex Shader will do is define the final position of a Vertex
+
+In OpenGL we can define variable to the Vertex Shader, but not to the Fragment Shader directly. Because that, our Fragment's variables must pass through the Vertex Shader
+我们能给顶点着色器定义变量，但片段着色器不行，由于这个原因片段着色器的变量必须由顶点着色器传入
+
 Fragment Shader（FSH） will be processed at each VISIBLE fragment of the final image。
+通常可以把一个片段理解成一个像素
+The final output to the Fragment Shader is a pixel color in the format RGBA.
 
 It's mandatory ONE Vertex Shader to ONE Fragment Shader, no more or less, must be exactly one to one. To ensure we'll not make mistakes, OpenGL has something called Program. A Program in OpenGL is just the compiled pair of VSH and FSH。一个顶点着色器董事对应一个片段着色器，为了保证一对一的关系，就出现了Program，保证它们成对编译
 
+---------------------------------------
 
 Setup EGL
 1.The first thing that EGL needs to know is where we want to display our content, normally it is done with the function eglGetDisplayEGL需要知道的第一件事就是在哪显示，通过eglGetDisplayEGL完成，让后通过eglInitialize 完成初始化
+
 2.使用eglChooseConfigs选择配置信息如： color format, colors individually, the sizes, the transparency, the samples per pixel, pixel format。这样就能桥连gles输出和屏幕设备
-3.为gles的渲染输出提供surface，有两种方式： eglCreateWindowSurface直接到屏幕 or eglCreatePbufferSurface离屏渲染
+
+3.After all configurations, you instruct EGL API to create a render surface, this means, the surface on which your OpenGL's render output will be placed
+为gles的渲染输出提供surface，有两种方式： eglCreateWindowSurface直接到屏幕 or eglCreatePbufferSurface离屏渲染
 通过上面三部EGL知道了窗口系统相关的信息，下面关联gles
-1.EGL需要知道从哪获取gles的frame buffer(一对)输出，只需要先创建EGL context，后调用eglmakeCurrent()就能使EGL使用gles的frame buffer.这里采用一对frame buffer交替渲染、显示，通过eglSwapBuffers（）切换，
+
+4.The EGL API use  2 frame buffer to place the OpenGL's render output into your desired surface.Only one Frame Buffer can be used at time
+
+5.EGL需要知道从哪获取gles的frame buffer(一对)输出，只需要先创建EGL context，后调用eglmakeCurrent()就能使EGL使用gles的frame buffer.这里采用一对frame buffer交替渲染、显示，通过eglSwapBuffers（）切换，an EGL's Context represent the OpenGL's side of the bridge
+
+
+-----------------------------------------------
+
+Normally meshes have three great informations: verticex, texture coordinates and normals. 
+// Array of vertices to a cube.
+GLfloat cube3D[] =  
+{
+    0.50,-0.50,-0.50,    // vertex 1
+    0.00,0.33,            // texture coordinate 1
+    1.00,0.00,0.00        // normal 1
+    0.50,-0.50,0.50,    // vertex 2
+    0.33,0.66,            // texture coordinate 2
+    0.00,1.00,0.00        // normal 2
+    ...
+}
+
+Internally OpenGL's always works with a frame buffer. This is called window-system-provided frame buffer and the frame buffer name/id 0 is reserved to it. The frame buffers which we control are know as application-created frame buffers. The depth and stencil render buffers are optionals. But the color buffer is always enabled and as OpenGL's core always uses a color render buffer too, the render buffer name/id 0 is reserved to it. To optimize all the optional states, OpenGL gives to us an way to turn on and turn off some states (understanding as state every optional OpenGL's feature). To do this, we use these function
+OpenGl内部有个名为窗口系统提供的帧缓冲，拥有保留名name/id 0,我们创建的是应用帧缓冲。在三种Render缓存中，颜色缓存是必用的，系统保留name/id 0，其他深度和蒙版可选。这些状态是有开关的，这种开关设置是全局的，有人喜欢打开用了一会就关闭，这样代价挺大，建议只开关一次。
+
+
+buffer objects are optimized storage for our primitive's arrays. 有两种顶点数组和索引数组
+
+1.the first is that we store the array of vertices, because it the buffer objects is also known as Vertex Buffer Object (VBO). 存储顶点数据的数组，也能存储纹理坐标数组或结构数组。some people also call this kind of buffer object as Array Buffer Object (ABO)
+
+2.The other kind of buffer object is the Index Buffer Object (IBO)，存储索引的数组，数组类型通常是GLubyte or GLushort
+
+Textures
+
+openGL 接受的纹理宽高都是2的幂次方，如32*64.一般图片格式存储像素信息的方式是从左上角到右下角，
+但openGL是从左下角读到右上角，所以图片的数据在上传到openGL之前都要进行垂直翻转。
+openGL的纹理是这样工作的，从一个image文件提取二进制的颜色信息，以16进制表示，也能同时提取alpha信息，即支持RGB或RGBA。将提取出的像素信息放入数组（texels）。这个像素的数组就能用来构建纹理对象
+
+OpenGL有个受人诟病的Texture Units，由设备制造商实现，必须支持到32个。
+These Units represent a temporary link between the stored array of pixels and the actual render processing. You'll use the Texture Units inside   shaders，more specifically inside the fragment shaders
+这个纹理单元就是一个 像素数组 和 实际的渲染处理 之间的临时连接。在片段着色器中使用
+By default each shader can use up to 8 textures，OpenGL has a limit to the pair of shader, though each shader could use up to 8 texture units, the pair of shader (vertex and fragment) are limited to use up to 8 texture units together
+默认每个着色器能使用8个纹理，但OpenGL对成对着色器有限制，即一个顶点和片段着色器一起也只能用8个。
+纹理数据位于CPU，大而多，为了方便着色器快速访问纹理数据，需要一个桥，所以就设计了Texture Units，能在GPU中直接处理，只要用户绑定GPU中的纹理单元和CPU中纹理数据。
+
+Rasterize
+The Rasterize in the strict sense is only the process which the OpenGL takes a 3D object and convert its bunch of maths into a 2D image.
+
+
+Attributes cannot be declared as arrays or structures.
+
+
+Model_View_Projection
+OpenGL camera is always at origin and facing to -Z in eye space
+The eye position and target are defined in world space
+a 3D point in eye space is projected onto the near plane (projection plane)
+Note that the eye coordinates are defined in the right-handed coordinate system, but NDC uses the left-handed coordinate system. That is, the camera at the origin is looking along -Z axis in eye space, but it is looking along +Z axis in NDC

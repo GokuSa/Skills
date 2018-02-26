@@ -98,3 +98,11 @@ mDataConnectionApn=   #APN名称
 
 带时间的日志
 adb logcat -v time MeetingActivity:D MeetingPresenter:D *:S
+
+使用adb旋转屏幕
+首先禁用自动旋转：
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+这条命令可以将屏幕设置为横向模式：
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
+这条命令可以将屏幕设置为纵向模式：
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
